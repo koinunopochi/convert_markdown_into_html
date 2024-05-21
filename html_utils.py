@@ -1,7 +1,5 @@
-# html.py
-
 import markdown
-from file import read_file
+from file_utils import read_file
 
 def convert_markdown_to_html(md_content):
     """
@@ -29,14 +27,27 @@ def generate_html_content(title, content):
     template = read_file("template_content.html")
     return template.format(title=title, content=content)
 
-def generate_index_html(content):
+def generate_index_html(index_content):
     """
     index.htmlの内容を生成する関数。
 
     Args:
-        content (str): index.htmlに追加するリンクのHTML。
+        index_content (str): index.htmlに追加するリンクのHTML。
 
     Returns:
         str: 生成されたindex.htmlの内容。
     """
-    return generate_html_content("Index", f"<h1>Files</h1><ul>{content}</ul>")
+    return generate_html_content("Index", f"<h1>Files</h1><ul>{index_content}</ul>")
+
+def generate_link_html(html_file, link_text):
+    """
+    リンクのHTMLを生成する関数。
+
+    Args:
+        html_file (str): HTMLファイル名。
+        link_text (str): リンクテキスト。
+
+    Returns:
+        str: 生成されたリンクのHTML。
+    """
+    return f"<li><a href='{html_file}'>{link_text}</a></li>\n"
