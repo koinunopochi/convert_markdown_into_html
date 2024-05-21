@@ -1,8 +1,8 @@
 import os
 from file_utils import read_file, save_file
-from html_utils import convert_markdown_to_html, generate_html_content, generate_index_html, generate_link_html
+from html_utils import convert_markdown_to_html, generate_html_content, generate_index_html
 
-def process_markdown_files_in_directory(doc_dir, output_dir):
+def process_markdown_files_in_directory(doc_dir, output_dir, icon_dir):
     """
     ディレクトリ内の.mdファイルを処理する関数。
 
@@ -14,7 +14,7 @@ def process_markdown_files_in_directory(doc_dir, output_dir):
         for file in files:
             if file.endswith(".md"):
                 file_path = os.path.join(root, file)
-                convert_markdown_file_to_html(file_path, output_dir)
+                convert_markdown_file_to_html(file_path, output_dir, icon_dir)
 
 def generate_and_save_index_html(doc_dir, output_dir):
     """
@@ -28,7 +28,7 @@ def generate_and_save_index_html(doc_dir, output_dir):
     index_path = os.path.join(output_dir, "index.html")
     save_file(index_path, generate_index_html(index_content))
 
-def convert_markdown_file_to_html(file_path, output_dir):
+def convert_markdown_file_to_html(file_path, output_dir, icon_dir):
     """
     .mdファイルをHTMLファイルに変換して保存する関数。
 
@@ -37,7 +37,7 @@ def convert_markdown_file_to_html(file_path, output_dir):
         output_dir (str): 出力先のディレクトリのパス。
     """
     md_content = read_file(file_path)
-    html_content = convert_markdown_to_html(md_content)
+    html_content = convert_markdown_to_html(md_content, icon_dir)
     html_file = os.path.splitext(os.path.basename(file_path))[0] + ".html"
     html_path = os.path.join(output_dir, html_file)
     save_file(html_path, generate_html_content(os.path.splitext(os.path.basename(file_path))[0], html_content))
