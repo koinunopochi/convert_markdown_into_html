@@ -1,107 +1,44 @@
-# docフォルダ配下にあるすべての.mdファイルを取得
-# それぞれのファイルをHTMLに変換してpublicフォルダに保存
-# 例: hoge.md -> hoge.html
-# index.htmlはそれぞれの.mdファイルをリンクにして表示する
+from directory_utils import process_markdown_files_in_directory, generate_and_save_index_html
+from command_line import validate_command_line_arguments
+from file_utils import create_output_directories, copy_css, copy_icon
+from html_utils import generate_pygments_css
+from markdownignore import read_markdownignore
 import os
-import sys
-import markdown
 
-# コマンドライン引数からdocフォルダのパスを取得
-if len(sys.argv) < 3:
-    print("使用法: python script.py <docフォルダのパス> <publicフォルダのパス>")
-    sys.exit(1)
+def main():
+    """
+    メイン関数。コマンドライン引数の処理、出力先の作成、docディレクトリの探索、index.htmlの生成と保存を行う。
+    """
+    doc_dir, output_dir,index_only,no_index,no_style, anchor_links  = validate_command_line_arguments()
 
-doc_dir = sys.argv[1]
+    create_output_directories(output_dir)
+    copy_icon(output_dir)
+    # --no-styleオプションが指定された場合はCSSのコピーをスキップ
+    if not no_style:
+        copy_css(output_dir)
+    else:
+        print('CSSのコピーをスキップしました。')
+    
+    ignore_patterns = read_markdownignore(doc_dir)
 
-# publicフォルダのパス
-public_dir = sys.argv[2]
+    # --index-onlyオプションが指定された場合はindex.htmlのみ生成
+    if index_only:
+        generate_and_save_index_html(doc_dir, output_dir, ignore_patterns, anchor_links)
+        print("index.htmlの生成が完了しました。")
+        return
+    
+    icon_dir = os.path.join(output_dir, 'icon')
+    process_markdown_files_in_directory(doc_dir, output_dir, icon_dir, ignore_patterns, anchor_links)
 
-# cssフォルダのパス
-css_dir = os.path.join(public_dir, "css")
+    # --no-indexオプションが指定された場合はindex.htmlを生成しない
+    if no_index:
+        print('index.htmlの生成をスキップしました。')
+    else:
+        generate_and_save_index_html(doc_dir, output_dir, ignore_patterns)
 
-# publicフォルダとcssフォルダが存在しない場合は作成
-if not os.path.exists(public_dir):
-    os.makedirs(public_dir)
-if not os.path.exists(css_dir):
-    os.makedirs(css_dir)
+    # Pygmentsのスタイルを使用してハイライト用のCSSファイルを生成
+    generate_pygments_css(output_dir)
+    print("変換が完了しました。")
 
-# index.htmlの内容を格納する文字列
-global index_html
-index_html = """
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Markdown Files</title>
-    <link rel="stylesheet" type="text/css" href="css/base.css">
-</head>
-<body>
-    <h1>Markdown Files</h1>
-    <ul>
-"""
-
-# 再帰的にディレクトリを探索し、.mdファイルを処理する関数
-def process_directory(dir_path):
-    global index_html
-    for item in os.listdir(dir_path):
-        item_path = os.path.join(dir_path, item)
-        
-        # ディレクトリの場合は再帰的に探索
-        if os.path.isdir(item_path):
-            process_directory(item_path)
-        
-        # .mdファイルの場合は処理
-        elif item.endswith(".md"):
-            # .mdファイルの内容を読み込む
-            with open(item_path, "r", encoding="utf-8") as file:
-                md_content = file.read()
-            
-            # Markdownを変換してHTMLを生成（コメントを無視する拡張機能を追加）
-            html_content = markdown.markdown(md_content, extensions=['markdown.extensions.fenced_code', 'markdown.extensions.codehilite'])
-            
-            # HTMLファイル名を生成
-            html_file = os.path.splitext(item)[0] + ".html"
-            
-            # HTMLファイルのフルパスを取得
-            html_path = os.path.join(public_dir, html_file)
-            
-            # 自動生成されたHTMLファイルにbase.cssを読み込むコードを追加
-            html_content = f"""
-<!DOCTYPE html>
-<html>
-<head>
-    <title>{os.path.splitext(item)[0]}</title>
-    <link rel="stylesheet" type="text/css" href="css/base.css">
-</head>
-<body>
-    {html_content}
-</body>
-</html>
-"""
-            
-            # HTMLファイルを保存
-            with open(html_path, "w", encoding="utf-8") as file:
-                file.write(html_content)
-            
-            # index.htmlにリンクを追加
-            relative_path = os.path.relpath(item_path, doc_dir)
-            link_text = os.path.splitext(relative_path)[0].replace("\\", "/")
-            index_html += f"      <li><a href='{html_file}'>{link_text}</a></li>\n"
-
-# docディレクトリを再帰的に探索
-process_directory(doc_dir)
-
-# index.htmlの終了タグを追加
-index_html += """
-    </ul>
-</body>
-</html>
-"""
-
-# index.htmlのフルパスを取得
-index_path = os.path.join(public_dir, "index.html")
-
-# index.htmlを保存
-with open(index_path, "w", encoding="utf-8") as file:
-    file.write(index_html)
-
-print("変換が完了しました。")
+if __name__ == "__main__":
+    main()
