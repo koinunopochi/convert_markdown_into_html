@@ -1,30 +1,36 @@
 import os
 from file_utils import read_file, save_file
 from html_utils import convert_markdown_to_html, generate_html_content, generate_index_html
+from markdownignore import is_ignored
 
-def process_markdown_files_in_directory(doc_dir, output_dir, icon_dir):
+def process_markdown_files_in_directory(doc_dir, output_dir, icon_dir, ignore_patterns):
     """
     ディレクトリ内の.mdファイルを処理する関数。
 
     Args:
         doc_dir (str): 探索するディレクトリのパス。
         output_dir (str): 出力先のディレクトリのパス。
+        icon_dir (str): アイコンファイルのディレクトリパス。
+        ignore_patterns (list): 無視するパターンのリスト。
     """
     for root, dirs, files in os.walk(doc_dir):
         for file in files:
             if file.endswith(".md"):
                 file_path = os.path.join(root, file)
-                convert_markdown_file_to_html(file_path, output_dir, icon_dir)
+                relative_path = os.path.relpath(file_path, doc_dir)
+                if not is_ignored(relative_path, ignore_patterns):
+                  convert_markdown_file_to_html(file_path, output_dir, icon_dir)
 
-def generate_and_save_index_html(doc_dir, output_dir):
+def generate_and_save_index_html(doc_dir, output_dir, ignore_patterns):
     """
     index.htmlを生成して保存する関数。
 
     Args:
         doc_dir (str): 探索するディレクトリのパス。
         output_dir (str): 出力先のディレクトリのパス。
+        ignore_patterns (list): 無視するパターンのリスト。
     """
-    index_content = generate_index_links_from_directory(doc_dir, output_dir)
+    index_content = generate_index_links_from_directory(doc_dir, output_dir, ignore_patterns)
     index_path = os.path.join(output_dir, "index.html")
     save_file(index_path, generate_index_html(index_content))
 
@@ -42,13 +48,14 @@ def convert_markdown_file_to_html(file_path, output_dir, icon_dir):
     html_path = os.path.join(output_dir, html_file)
     save_file(html_path, generate_html_content(os.path.splitext(os.path.basename(file_path))[0], html_content))
 
-def generate_index_links_from_directory(dir_path, output_dir, level=0):
+def generate_index_links_from_directory(dir_path, output_dir, ignore_patterns, level=0):
     """
     ディレクトリ内の.mdファイルからindex.htmlに追加するリンクのHTMLを生成する関数。
 
     Args:
         dir_path (str): 探索するディレクトリのパス。
         output_dir (str): 出力先のディレクトリのパス。
+        ignore_patterns (list): 無視するパターンのリスト。
         level (int): 階層レベル（デフォルトは0）。
 
     Returns:
@@ -62,15 +69,21 @@ def generate_index_links_from_directory(dir_path, output_dir, level=0):
     index_links += f"{indent}<ul>\n"
 
     for item in os.listdir(dir_path):
+        
         item_path = os.path.join(dir_path, item)
-        if os.path.isdir(item_path):
-            # 再帰的にサブディレクトリを探索
-            index_links += generate_index_links_from_directory(item_path, output_dir, level + 1)
-        elif item.endswith(".md"):
-            html_file = generate_html_file_name(item)
-            relative_path = generate_relative_path(item_path, dir_path)
-            link_text = generate_link_text(relative_path)
-            index_links += f"{indent}  <li><a href='{html_file}'>{link_text}</a></li>\n"
+        relative_path = os.path.relpath(item_path, dir_path)
+
+        if not is_ignored(relative_path, ignore_patterns):
+
+          if os.path.isdir(item_path):
+              # 再帰的にサブディレクトリを探索
+              index_links += generate_index_links_from_directory(item_path, output_dir, ignore_patterns, level + 1)
+
+          elif item.endswith(".md"):
+              html_file = generate_html_file_name(item)
+              relative_path = generate_relative_path(item_path, dir_path)
+              link_text = generate_link_text(relative_path)
+              index_links += f"{indent}  <li><a href='{html_file}'>{link_text}</a></li>\n"
 
     index_links += f"{indent}</ul>\n"
     return index_links

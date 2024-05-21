@@ -2,6 +2,7 @@ from directory_utils import process_markdown_files_in_directory, generate_and_sa
 from command_line import validate_command_line_arguments
 from file_utils import create_output_directories, copy_css, copy_icon
 from html_utils import generate_pygments_css
+from markdownignore import read_markdownignore
 import os
 
 def main():
@@ -12,25 +13,28 @@ def main():
 
     create_output_directories(output_dir)
     copy_icon(output_dir)
+    # --no-styleオプションが指定された場合はCSSのコピーをスキップ
     if not no_style:
         copy_css(output_dir)
     else:
         print('CSSのコピーをスキップしました。')
+    
+    ignore_patterns = read_markdownignore(doc_dir)
 
     # --index-onlyオプションが指定された場合はindex.htmlのみ生成
     if index_only:
-        generate_and_save_index_html(doc_dir, output_dir)
+        generate_and_save_index_html(doc_dir, output_dir, ignore_patterns)
         print("index.htmlの生成が完了しました。")
         return
     
     icon_dir = os.path.join(output_dir, 'icon')
-    process_markdown_files_in_directory(doc_dir, output_dir, icon_dir)
+    process_markdown_files_in_directory(doc_dir, output_dir, icon_dir, ignore_patterns)
 
     # --no-indexオプションが指定された場合はindex.htmlを生成しない
     if no_index:
         print('index.htmlの生成をスキップしました。')
     else:
-        generate_and_save_index_html(doc_dir, output_dir)
+        generate_and_save_index_html(doc_dir, output_dir, ignore_patterns)
 
     # Pygmentsのスタイルを使用してハイライト用のCSSファイルを生成
     generate_pygments_css(output_dir)
