@@ -103,3 +103,28 @@ code {
 .style-alert p {
   margin: 0;
 }
+
+/* 目次機能を有効化した */
+.toc {
+  margin-bottom: 20px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.toc ul {
+  list-style-type: none;
+  padding-left: 20px;
+}
+
+.toc ul ul {
+  padding-left: 20px;
+}
+
+.toc a {
+  text-decoration: none;
+}
+
+.toc a:hover {
+  text-decoration: underline;
+}

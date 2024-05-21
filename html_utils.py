@@ -1,4 +1,5 @@
 import re
+import unicodedata
 import markdown
 from pygments import highlight
 from pygments.lexers import get_lexer_by_name
@@ -6,24 +7,57 @@ from pygments.formatters import HtmlFormatter
 import os
 
 from file_utils import read_file
-def convert_markdown_to_html(md_content, icon_dir):
+def convert_markdown_to_html(md_content, icon_dir, anchor_links):
     """
     MarkdownをHTMLに変換する関数。
 
     Args:
         md_content (str): Markdownの内容。
         icon_dir (str): アイコンファイルのディレクトリパス。
+        anchor_links (bool): アンカーリンクを生成するかどうか。
 
     Returns:
         str: 変換されたHTMLの内容。
     """
-    extensions = ['markdown.extensions.fenced_code', 'codehilite']
-    html_content = markdown.markdown(md_content, extensions=extensions)
-    
-    # info、warn、alertのブロックを変換
+    extensions = ['markdown.extensions.fenced_code', 'codehilite', 'markdown.extensions.toc']
+    extension_configs = {
+        'markdown.extensions.toc': {
+            'anchorlink': anchor_links,
+            'permalink': anchor_links,
+            'toc_depth': '2-4',
+        },
+    }
+    md = markdown.Markdown(extensions=extensions, extension_configs=extension_configs)
+
+    html_content = md.convert(md_content)
+
+    # 目次を取得
+    toc = md.toc
+
+    # info、warn、errorのブロックを変換
     html_content = convert_info_warn_alert_blocks(html_content, icon_dir)
-    
+
+    # 目次を追加
+    if anchor_links:
+        html_content = f"<div class='toc'>{toc}</div>{html_content}"
+
     return html_content
+
+def slugify(value, separator):
+    """
+    文字列をスラッグ化する関数。
+
+    Args:
+        value (str): スラッグ化する文字列。
+        separator (str): スラッグのセパレータ。
+
+    Returns:
+        str: スラッグ化された文字列。
+    """
+    slug = unicodedata.normalize('NFKD', value).encode('ascii', 'ignore').decode('ascii')
+    slug = re.sub(r'[^\w\s-]', '', slug).strip().lower()
+    slug = re.sub(r'[-\s]+', separator, slug)
+    return slug
 
 def convert_info_warn_alert_blocks(html_content, icon_dir):
     """
