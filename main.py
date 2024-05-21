@@ -29,18 +29,23 @@ def generate_html_content(title, content):
     Returns:
         str: 生成されたHTMLファイルの内容。
     """
-    return f"""
-<!DOCTYPE html>
-<html>
-<head>
-    <title>{title}</title>
-    <link rel="stylesheet" type="text/css" href="css/base.css">
-</head>
-<body>
-    {content}
-</body>
-</html>
-"""
+    with open("template_content.html", "r", encoding="utf-8") as file:
+        template = file.read()
+    
+    return template.format(title=title, content=content)
+
+def generate_index_html(content):
+    """
+    index.htmlの内容を生成する関数。
+
+    Args:
+        content (str): index.htmlに追加するリンクのHTML。
+
+    Returns:
+        str: 生成されたindex.htmlの内容。
+    """
+
+    return generate_html_content("Index", f"<h1>Files</h1><ul>{content}</ul>")
 
 def save_html_file(file_path, content):
     """
@@ -97,18 +102,6 @@ def process_directory(dir_path, output_dir):
     
     return index_links
 
-def generate_index_html(content):
-    """
-    index.htmlの内容を生成する関数。
-
-    Args:
-        content (str): index.htmlに追加するリンクのHTML。
-
-    Returns:
-        str: 生成されたindex.htmlの内容。
-    """
-
-    return generate_html_content("Index", f"<h1>Files</h1><ul>{content}</ul>")
 
 def main():
     """
