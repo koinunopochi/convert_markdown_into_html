@@ -20,14 +20,14 @@ def convert_markdown_to_html(md_content, icon_dir):
     extensions = ['markdown.extensions.fenced_code', 'codehilite']
     html_content = markdown.markdown(md_content, extensions=extensions)
     
-    # info、warn、errorのブロックを変換
-    html_content = convert_info_warn_error_blocks(html_content, icon_dir)
+    # info、warn、alertのブロックを変換
+    html_content = convert_info_warn_alert_blocks(html_content, icon_dir)
     
     return html_content
 
-def convert_info_warn_error_blocks(html_content, icon_dir):
+def convert_info_warn_alert_blocks(html_content, icon_dir):
     """
-    info、warn、errorのブロックを適切なHTMLに変換する関数。
+    info、warn、alertのブロックを適切なHTMLに変換する関数。
 
     Args:
         html_content (str): HTMLの内容。
@@ -46,9 +46,9 @@ def convert_info_warn_error_blocks(html_content, icon_dir):
         elif block_type == 'warn':
             icon_path = os.path.join(icon_dir, 'warn.svg')
             style = 'style-warn'
-        elif block_type == 'error':
-            icon_path = os.path.join(icon_dir, 'error.svg')
-            style = 'style-error'
+        elif block_type == 'alert':
+            icon_path = os.path.join(icon_dir, 'alert.svg')
+            style = 'style-alert'
         
         # SVGファイルを読み込んでアイコンを生成
         with open(icon_path, 'r') as file:
@@ -59,7 +59,7 @@ def convert_info_warn_error_blocks(html_content, icon_dir):
         
         return f'<div class="{style}">{icon}<p>{content}</p></div>'
     
-    pattern = re.compile(r':::note (info|warn|error)\s*(.*?):::(?!:)', re.DOTALL)
+    pattern = re.compile(r':::note (info|warn|alert)\s*(.*?):::(?!:)', re.DOTALL)
     html_content = pattern.sub(replace_block, html_content)
     
     return html_content
