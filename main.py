@@ -5,6 +5,7 @@
 import os
 import sys
 import markdown
+from file import read_file, save_file
 
 def convert_markdown_to_html(md_content):
     """
@@ -29,9 +30,7 @@ def generate_html_content(title, content):
     Returns:
         str: 生成されたHTMLファイルの内容。
     """
-    with open("template_content.html", "r", encoding="utf-8") as file:
-        template = file.read()
-    
+    template = read_file("template_content.html")
     return template.format(title=title, content=content)
 
 def generate_index_html(content):
@@ -44,19 +43,7 @@ def generate_index_html(content):
     Returns:
         str: 生成されたindex.htmlの内容。
     """
-
     return generate_html_content("Index", f"<h1>Files</h1><ul>{content}</ul>")
-
-def save_html_file(file_path, content):
-    """
-    HTMLファイルを保存する関数。
-
-    Args:
-        file_path (str): 保存するHTMLファイルのパス。
-        content (str): 保存するHTMLファイルの内容。
-    """
-    with open(file_path, "w", encoding="utf-8") as file:
-        file.write(content)
 
 def process_directory(dir_path, output_dir):
     """
@@ -70,38 +57,28 @@ def process_directory(dir_path, output_dir):
         str: index.htmlに追加するリンクのHTML。
     """
     index_links = ""
+    
     for item in os.listdir(dir_path):
         item_path = os.path.join(dir_path, item)
         
-        # ディレクトリの場合は再帰的に探索
         if os.path.isdir(item_path):
             index_links += process_directory(item_path, output_dir)
-        
-        # .mdファイルの場合は処理
-        elif item.endswith(".md"):
-            # .mdファイルの内容を読み込む
-            with open(item_path, "r", encoding="utf-8") as file:
-                md_content = file.read()
+        else:
+            if not item.endswith(".md"):
+                continue
             
-            # MarkdownをHTMLに変換
+            md_content = read_file(item_path)
             html_content = convert_markdown_to_html(md_content)
-            
-            # HTMLファイル名を生成
             html_file = os.path.splitext(item)[0] + ".html"
-            
-            # HTMLファイルのフルパスを取得
             html_path = os.path.join(output_dir, html_file)
             
-            # HTMLファイルを保存
-            save_html_file(html_path, generate_html_content(os.path.splitext(item)[0], html_content))
+            save_file(html_path, generate_html_content(os.path.splitext(item)[0], html_content))
             
-            # index.htmlにリンクを追加
             relative_path = os.path.relpath(item_path, dir_path)
             link_text = os.path.splitext(relative_path)[0].replace("\\", "/")
             index_links += f"<li><a href='{html_file}'>{link_text}</a></li>\n"
     
     return index_links
-
 
 def main():
     """
@@ -111,24 +88,24 @@ def main():
     if len(sys.argv) < 3:
         print("使用法: python script.py <docフォルダのパス> <出力先>")
         sys.exit(1)
-
+    
     doc_dir = sys.argv[1]
     output_dir = sys.argv[2]
-
+    
     # 出力先のフォルダとcssフォルダが存在しない場合は作成
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
     css_dir = os.path.join(output_dir, "css")
     if not os.path.exists(css_dir):
         os.makedirs(css_dir)
-
+    
     # docディレクトリを再帰的に探索
     index_content = process_directory(doc_dir, output_dir)
-
+    
     # index.htmlを生成して保存
     index_path = os.path.join(output_dir, "index.html")
-    save_html_file(index_path, generate_index_html(index_content))
-
+    save_file(index_path, generate_index_html(index_content))
+    
     print("変換が完了しました。")
 
 if __name__ == "__main__":
