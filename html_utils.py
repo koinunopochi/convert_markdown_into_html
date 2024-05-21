@@ -140,7 +140,7 @@ def generate_index_html(index_content):
     Returns:
         str: 生成されたindex.htmlの内容。
     """
-    return generate_html_content("Index", f"<h1>Files</h1><ul>{index_content}</ul>")
+    return generate_html_content("Index", f"<div class='root'><div class='content'><h1>Files</h1><ul>{index_content}</ul></div></div>")
 
 def generate_link_html(html_file, link_text):
     """
