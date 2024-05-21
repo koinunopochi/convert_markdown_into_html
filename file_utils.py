@@ -1,4 +1,3 @@
-# file.py
 import os
 
 def read_file(file_path):
@@ -32,8 +31,6 @@ def create_output_directories(output_dir):
     Args:
         output_dir (str): 出力先のディレクトリのパス。
     """
-    if not os.path.exists(output_dir):
-        os.makedirs(output_dir)
+    os.makedirs(output_dir, exist_ok=True)
     css_dir = os.path.join(output_dir, "css")
-    if not os.path.exists(css_dir):
-        os.makedirs(css_dir)
+    os.makedirs(css_dir, exist_ok=True)
