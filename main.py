@@ -8,7 +8,7 @@ def main():
     """
     メイン関数。コマンドライン引数の処理、出力先の作成、docディレクトリの探索、index.htmlの生成と保存を行う。
     """
-    doc_dir, output_dir,index_only = validate_command_line_arguments()
+    doc_dir, output_dir,index_only,no_index = validate_command_line_arguments()
 
     create_output_directories(output_dir)
     # --index-onlyオプションが指定された場合はindex.htmlのみ生成
@@ -19,7 +19,10 @@ def main():
     
     icon_dir = os.path.join(output_dir, 'icon')
     process_markdown_files_in_directory(doc_dir, output_dir, icon_dir)
-    generate_and_save_index_html(doc_dir, output_dir)
+
+    # --no-indexオプションが指定された場合はindex.htmlを生成しない
+    if not no_index:
+        generate_and_save_index_html(doc_dir, output_dir)
     # Pygmentsのスタイルを使用してハイライト用のCSSファイルを生成
     generate_pygments_css(output_dir)
     print("変換が完了しました。")
