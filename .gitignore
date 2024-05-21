@@ -1,0 +1,11 @@
+.history
+doc
+public
+
+# vscode
+.vscode
+
+# python
+.venv
+__pycache__
+
