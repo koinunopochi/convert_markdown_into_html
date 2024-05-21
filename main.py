@@ -1,6 +1,7 @@
 from directory_utils import process_markdown_files_in_directory, generate_and_save_index_html
 from command_line import validate_command_line_arguments
 from file_utils import create_output_directories
+from html_utils import generate_pygments_css
 
 def main():
     """
@@ -10,6 +11,8 @@ def main():
     create_output_directories(output_dir)
     process_markdown_files_in_directory(doc_dir, output_dir)
     generate_and_save_index_html(doc_dir, output_dir)
+    # Pygmentsのスタイルを使用してハイライト用のCSSファイルを生成
+    generate_pygments_css(output_dir)
     print("変換が完了しました。")
 
 if __name__ == "__main__":

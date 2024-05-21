@@ -1,5 +1,11 @@
 import markdown
+from pygments import highlight
+from pygments.lexers import get_lexer_by_name
+from pygments.formatters import HtmlFormatter
+import os
+
 from file_utils import read_file
+
 
 def convert_markdown_to_html(md_content):
     """
@@ -11,7 +17,9 @@ def convert_markdown_to_html(md_content):
     Returns:
         str: 変換されたHTMLの内容。
     """
-    return markdown.markdown(md_content, extensions=['markdown.extensions.fenced_code', 'markdown.extensions.codehilite'])
+    extensions = ['markdown.extensions.fenced_code', 'codehilite']
+    html_content = markdown.markdown(md_content, extensions=extensions)
+    return html_content
 
 def generate_html_content(title, content):
     """
@@ -26,6 +34,21 @@ def generate_html_content(title, content):
     """
     template = read_file("template_content.html")
     return template.format(title=title, content=content)
+
+def generate_pygments_css(output_dir):
+    """
+    Pygmentsのスタイルを使用してハイライト用のCSSファイルを生成する関数。
+
+    Args:
+        output_dir (str): 出力先のディレクトリのパス。
+    """
+    formatter = HtmlFormatter(style='default')
+    css_content = formatter.get_style_defs('.codehilite')
+    css_dir = os.path.join(output_dir, 'css')
+    os.makedirs(css_dir, exist_ok=True)
+    css_path = os.path.join(css_dir, 'pygments.css')
+    with open(css_path, 'w', encoding='utf-8') as file:
+        file.write(css_content)
 
 def generate_index_html(index_content):
     """
