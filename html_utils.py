@@ -7,6 +7,7 @@ from pygments.formatters import HtmlFormatter
 import os
 
 from file_utils import read_file
+
 def convert_markdown_to_html(md_content, icon_dir, anchor_links):
     """
     MarkdownをHTMLに変換する関数。
@@ -37,9 +38,11 @@ def convert_markdown_to_html(md_content, icon_dir, anchor_links):
     # info、warn、errorのブロックを変換
     html_content = convert_info_warn_alert_blocks(html_content, icon_dir)
 
-    # 目次を追加
+    # 目次を右側に配置
     if anchor_links:
-        html_content = f"<div class='toc'>{toc}</div>{html_content}"
+        html_content = f"<div class='root'><div class='content'>{html_content}</div>{toc}</div>"
+    else:
+        html_content = f"<div class='root'><div class='content'>{html_content}</div></div>"
 
     return html_content
 

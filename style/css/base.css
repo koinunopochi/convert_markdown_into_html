@@ -6,10 +6,24 @@ body {
   background-color: #f8f9fa;
   color: #212529;
   line-height: 1.6;
-  width: 80%;
-  max-width: 960px;
+  width: 100%;
   margin: 0 auto;
 }
+
+.root {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 20px;
+}
+
+.content {
+  flex: 1;
+  width: 70%;
+  max-width: 960px;
+  margin: 0 20px;
+}
+
 
 h1 {
   font-size: 2.5rem;
@@ -106,10 +120,19 @@ code {
 
 /* 目次機能を有効化した */
 .toc {
-  margin-bottom: 20px;
+  width: 300px;
   padding: 10px;
   border: 1px solid #ccc;
   border-radius: 4px;
+  /* textは折り返さない */
+  white-space: nowrap;
+  overflow: auto;
+  /* スクロールしても追従する */
+  position: -webkit-sticky;
+  position: sticky;
+  top: 20px;
+  /* スクロールしてもz-indexが最も上になる */
+  z-index: 1000;
 }
 
 .toc ul {
