@@ -34,10 +34,10 @@ def generate_index_links_from_directory(dir_path, output_dir):
         if os.path.isdir(item_path):
             index_links += generate_index_links_from_directory(item_path, output_dir)
         elif item.endswith(".md"):
-            html_file = os.path.splitext(item)[0] + ".html"
-            relative_path = os.path.relpath(item_path, dir_path)
-            link_text = os.path.splitext(relative_path)[0].replace("\\", "/")
-            index_links += f"<li><a href='{html_file}'>{link_text}</a></li>\n"
+            html_file = generate_html_file_name(item)
+            relative_path = generate_relative_path(item_path, dir_path)
+            link_text = generate_link_text(relative_path)
+            index_links += generate_link_html(html_file, link_text)
     return index_links
 
 def process_markdown_files_in_directory(doc_dir, output_dir):
@@ -65,6 +65,56 @@ def generate_and_save_index_html(doc_dir, output_dir):
     index_content = generate_index_links_from_directory(doc_dir, output_dir)
     index_path = os.path.join(output_dir, "index.html")
     save_file(index_path, generate_index_html(index_content))
+
+def generate_html_file_name(item):
+    """
+    アイテム名からHTMLファイル名を生成する関数。
+
+    Args:
+        item (str): アイテム名。
+
+    Returns:
+        str: 生成されたHTMLファイル名。
+    """
+    return os.path.splitext(item)[0] + ".html"
+
+def generate_relative_path(item_path, dir_path):
+    """
+    相対パスを生成する関数。
+
+    Args:
+        item_path (str): アイテムのパス。
+        dir_path (str): ディレクトリのパス。
+
+    Returns:
+        str: 生成された相対パス。
+    """
+    return os.path.relpath(item_path, dir_path)
+
+def generate_link_text(relative_path):
+    """
+    リンクテキストを生成する関数。
+
+    Args:
+        relative_path (str): 相対パス。
+
+    Returns:
+        str: 生成されたリンクテキスト。
+    """
+    return os.path.splitext(relative_path)[0].replace("\\", "/")
+
+def generate_link_html(html_file, link_text):
+    """
+    リンクのHTMLを生成する関数。
+
+    Args:
+        html_file (str): HTMLファイル名。
+        link_text (str): リンクテキスト。
+
+    Returns:
+        str: 生成されたリンクのHTML。
+    """
+    return f"<li><a href='{html_file}'>{link_text}</a></li>\n"
 
 def main():
     """
