@@ -107,21 +107,8 @@ def generate_index_html(content):
     Returns:
         str: 生成されたindex.htmlの内容。
     """
-    return f"""
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Markdown Files</title>
-    <link rel="stylesheet" type="text/css" href="css/base.css">
-</head>
-<body>
-    <h1>Markdown Files</h1>
-    <ul>
-        {content}
-    </ul>
-</body>
-</html>
-"""
+
+    return generate_html_content("Index", f"<h1>Files</h1><ul>{content}</ul>")
 
 def main():
     """
