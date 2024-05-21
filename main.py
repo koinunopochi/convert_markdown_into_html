@@ -23,8 +23,11 @@ def main():
     process_markdown_files_in_directory(doc_dir, output_dir, icon_dir)
 
     # --no-indexオプションが指定された場合はindex.htmlを生成しない
-    if not no_index:
+    if no_index:
+        print('index.htmlの生成をスキップしました。')
+    else:
         generate_and_save_index_html(doc_dir, output_dir)
+
     # Pygmentsのスタイルを使用してハイライト用のCSSファイルを生成
     generate_pygments_css(output_dir)
     print("変換が完了しました。")
