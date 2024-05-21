@@ -1,14 +1,14 @@
 import os
 import sys
-from file import read_file, save_file
-from html_utils import convert_markdown_to_html, generate_html_content, generate_index_html
+from file import read_file, save_file, create_output_directories
+from html_utils import generate_html_content, generate_index_html, convert_markdown_to_html
 
-def process_file(file_path, output_dir):
+def convert_markdown_file_to_html(file_path, output_dir):
     """
-    .mdファイルを処理し、HTMLファイルを生成する関数。
+    .mdファイルをHTMLファイルに変換して保存する関数。
 
     Args:
-        file_path (str): 処理するファイルのパス。
+        file_path (str): 変換するMarkdownファイルのパス。
         output_dir (str): 出力先のディレクトリのパス。
     """
     md_content = read_file(file_path)
@@ -17,7 +17,7 @@ def process_file(file_path, output_dir):
     html_path = os.path.join(output_dir, html_file)
     save_file(html_path, generate_html_content(os.path.splitext(os.path.basename(file_path))[0], html_content))
 
-def generate_index_links(dir_path, output_dir):
+def generate_index_links_from_directory(dir_path, output_dir):
     """
     ディレクトリ内の.mdファイルからindex.htmlに追加するリンクのHTMLを生成する関数。
 
@@ -32,7 +32,7 @@ def generate_index_links(dir_path, output_dir):
     for item in os.listdir(dir_path):
         item_path = os.path.join(dir_path, item)
         if os.path.isdir(item_path):
-            index_links += generate_index_links(item_path, output_dir)
+            index_links += generate_index_links_from_directory(item_path, output_dir)
         elif item.endswith(".md"):
             html_file = os.path.splitext(item)[0] + ".html"
             relative_path = os.path.relpath(item_path, dir_path)
@@ -51,22 +51,18 @@ def main():
     doc_dir = sys.argv[1]
     output_dir = sys.argv[2]
 
-    # 出力先のフォルダとcssフォルダが存在しない場合は作成
-    if not os.path.exists(output_dir):
-        os.makedirs(output_dir)
-    css_dir = os.path.join(output_dir, "css")
-    if not os.path.exists(css_dir):
-        os.makedirs(css_dir)
+    # 出力先のディレクトリとcssディレクトリを作成
+    create_output_directories(output_dir)
 
     # docディレクトリ内の.mdファイルを処理
     for root, dirs, files in os.walk(doc_dir):
         for file in files:
             if file.endswith(".md"):
                 file_path = os.path.join(root, file)
-                process_file(file_path, output_dir)
+                convert_markdown_file_to_html(file_path, output_dir)
 
     # index.htmlに追加するリンクのHTMLを生成
-    index_content = generate_index_links(doc_dir, output_dir)
+    index_content = generate_index_links_from_directory(doc_dir, output_dir)
 
     # index.htmlを生成して保存
     index_path = os.path.join(output_dir, "index.html")
