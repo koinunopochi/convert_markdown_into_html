@@ -1,4 +1,5 @@
 import os
+import shutil
 
 def read_file(file_path):
     """
@@ -24,6 +25,7 @@ def save_file(file_path, content):
     with open(file_path, "w", encoding="utf-8") as file:
         file.write(content)
 
+
 def create_output_directories(output_dir):
     """
     出力先のディレクトリとcssディレクトリを作成する関数。
@@ -34,3 +36,22 @@ def create_output_directories(output_dir):
     os.makedirs(output_dir, exist_ok=True)
     css_dir = os.path.join(output_dir, "css")
     os.makedirs(css_dir, exist_ok=True)
+
+def copy_style_directories(output_dir):
+    """
+    styleディレクトリからcssとiconディレクトリをコピーする関数。
+
+    Args:
+        output_dir (str): 出力先のディレクトリのパス。
+    """
+    style_dir = os.path.join(os.path.dirname(__file__), "style")
+    
+    css_src_dir = os.path.join(style_dir, "css")
+    css_dest_dir = os.path.join(output_dir, "css")
+    if os.path.exists(css_src_dir):
+        shutil.copytree(css_src_dir, css_dest_dir, dirs_exist_ok=True)
+    
+    icon_src_dir = os.path.join(style_dir, "icon")
+    icon_dest_dir = os.path.join(output_dir, "icon")
+    if os.path.exists(icon_src_dir):
+        shutil.copytree(icon_src_dir, icon_dest_dir, dirs_exist_ok=True)

@@ -1,0 +1,105 @@
+/* base.css */
+body {
+  font-family: 'Segoe UI', Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f8f9fa;
+  color: #212529;
+  line-height: 1.6;
+  width: 80%;
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+h1 {
+  font-size: 2.5rem;
+  margin-bottom: 1.5rem;
+  color: #343a40;
+}
+
+
+li {
+  margin-bottom: 10px;
+}
+
+li ul {
+  margin-left: 20px;
+  margin-top: 5px;
+}
+
+a {
+  color: #007bff;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+a:hover {
+  color: #0056b3;
+}
+
+pre {
+  background-color: #e9ecef;
+  padding: 15px;
+  overflow-x: auto;
+  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+code {
+  font-family: 'Courier New', monospace;
+  font-size: 0.9rem;
+  color: #333;
+  border-radius: 20px;
+  padding: 0.2em 0.4em;
+}
+
+.directory {
+  font-weight: bold;
+  color: #333;
+}
+
+@media screen and (max-width: 600px) {
+  h1 {
+    font-size: 2rem;
+  }
+}
+
+/* info、warn、alertのスタイル */
+.style-info,
+.style-warn,
+.style-alert {
+  display: flex;
+  align-items: center;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border-radius: 4px;
+}
+
+.style-info {
+  background-color: #d2fdd5d0;
+  border-left: 4px solid #10be00;
+}
+
+.style-warn {
+  background-color: #fef7e0;
+  border-left: 4px solid #f9ab00;
+}
+
+.style-alert {
+  background-color: #fce8e6;
+  border-left: 4px solid #d93025;
+}
+
+.style-info svg,
+.style-warn svg,
+.style-alert svg {
+  width: 24px;
+  height: 24px;
+  margin-right: 1rem;
+}
+
+.style-info p,
+.style-warn p,
+.style-alert p {
+  margin: 0;
+}
