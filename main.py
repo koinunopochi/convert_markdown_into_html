@@ -40,34 +40,54 @@ def generate_index_links_from_directory(dir_path, output_dir):
             index_links += f"<li><a href='{html_file}'>{link_text}</a></li>\n"
     return index_links
 
-def main():
+def process_markdown_files_in_directory(doc_dir, output_dir):
     """
-    メイン関数。コマンドライン引数の処理、出力先の作成、docディレクトリの探索、index.htmlの生成と保存を行う。
+    ディレクトリ内の.mdファイルを処理する関数。
+
+    Args:
+        doc_dir (str): 探索するディレクトリのパス。
+        output_dir (str): 出力先のディレクトリのパス。
     """
-    # コマンドライン引数からdocフォルダのパスと出力先を取得
-    if len(sys.argv) < 3:
-        print("使用法: python script.py <docフォルダのパス> <出力先>")
-        sys.exit(1)
-    doc_dir = sys.argv[1]
-    output_dir = sys.argv[2]
-
-    # 出力先のディレクトリとcssディレクトリを作成
-    create_output_directories(output_dir)
-
-    # docディレクトリ内の.mdファイルを処理
     for root, dirs, files in os.walk(doc_dir):
         for file in files:
             if file.endswith(".md"):
                 file_path = os.path.join(root, file)
                 convert_markdown_file_to_html(file_path, output_dir)
 
-    # index.htmlに追加するリンクのHTMLを生成
-    index_content = generate_index_links_from_directory(doc_dir, output_dir)
+def generate_and_save_index_html(doc_dir, output_dir):
+    """
+    index.htmlを生成して保存する関数。
 
-    # index.htmlを生成して保存
+    Args:
+        doc_dir (str): 探索するディレクトリのパス。
+        output_dir (str): 出力先のディレクトリのパス。
+    """
+    index_content = generate_index_links_from_directory(doc_dir, output_dir)
     index_path = os.path.join(output_dir, "index.html")
     save_file(index_path, generate_index_html(index_content))
 
+def validate_command_line_arguments():
+    """
+    コマンドライン引数を検証する関数。
+
+    Returns:
+        tuple: (doc_dir, output_dir) コマンドライン引数が有効な場合はdocフォルダのパスと出力先のパスを返す。
+    """
+    if len(sys.argv) < 3:
+        print("使用法: python script.py <docフォルダのパス> <出力先>")
+        sys.exit(1)
+    doc_dir = sys.argv[1]
+    output_dir = sys.argv[2]
+    return doc_dir, output_dir
+
+def main():
+    """
+    メイン関数。コマンドライン引数の処理、出力先の作成、docディレクトリの探索、index.htmlの生成と保存を行う。
+    """
+    doc_dir, output_dir = validate_command_line_arguments()
+    create_output_directories(output_dir)
+    process_markdown_files_in_directory(doc_dir, output_dir)
+    generate_and_save_index_html(doc_dir, output_dir)
     print("変換が完了しました。")
 
 if __name__ == "__main__":
