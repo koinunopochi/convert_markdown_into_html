@@ -42,27 +42,37 @@ def convert_markdown_file_to_html(file_path, output_dir):
     html_path = os.path.join(output_dir, html_file)
     save_file(html_path, generate_html_content(os.path.splitext(os.path.basename(file_path))[0], html_content))
 
-def generate_index_links_from_directory(dir_path, output_dir):
+def generate_index_links_from_directory(dir_path, output_dir, level=0):
     """
     ディレクトリ内の.mdファイルからindex.htmlに追加するリンクのHTMLを生成する関数。
 
     Args:
         dir_path (str): 探索するディレクトリのパス。
         output_dir (str): 出力先のディレクトリのパス。
+        level (int): 階層レベル（デフォルトは0）。
 
     Returns:
         str: index.htmlに追加するリンクのHTML。
     """
     index_links = ""
+    indent = "  " * level  # インデントを表現するための空白文字列
+
+    # ディレクトリ名を表示
+    index_links += f"{indent}<li>{os.path.basename(dir_path)}/</li>\n"
+    index_links += f"{indent}<ul>\n"
+
     for item in os.listdir(dir_path):
         item_path = os.path.join(dir_path, item)
         if os.path.isdir(item_path):
-            index_links += generate_index_links_from_directory(item_path, output_dir)
+            # 再帰的にサブディレクトリを探索
+            index_links += generate_index_links_from_directory(item_path, output_dir, level + 1)
         elif item.endswith(".md"):
             html_file = generate_html_file_name(item)
             relative_path = generate_relative_path(item_path, dir_path)
             link_text = generate_link_text(relative_path)
-            index_links += generate_link_html(html_file, link_text)
+            index_links += f"{indent}  <li><a href='{html_file}'>{link_text}</a></li>\n"
+
+    index_links += f"{indent}</ul>\n"
     return index_links
 
 def generate_html_file_name(item):
