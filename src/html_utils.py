@@ -112,7 +112,8 @@ def generate_html_content(title, content):
     Returns:
         str: 生成されたHTMLファイルの内容。
     """
-    template = read_file("template_content.html")
+    template_path = os.path.join(os.path.dirname(__file__), 'template_content.html')
+    template = read_file(template_path)
     return template.format(title=title, content=content)
 
 def generate_pygments_css(output_dir):
