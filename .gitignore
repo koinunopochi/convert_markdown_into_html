@@ -1,7 +1,8 @@
 .history
 doc
 .public
-
+.sample*
+.mark*
 # vscode
 .vscode
 
@@ -12,3 +13,6 @@ __pycache__/
 venv/
 .env
 .idea/
+
+# setup cache
+mkToHtml.egg*

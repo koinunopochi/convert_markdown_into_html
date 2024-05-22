@@ -20,7 +20,14 @@ def convert_markdown_to_html(md_content, icon_dir, anchor_links):
     Returns:
         str: 変換されたHTMLの内容。
     """
-    extensions = ['markdown.extensions.fenced_code', 'codehilite', 'markdown.extensions.toc']
+    # ネストされたリストを適切に処理
+    md_content = convert_nested_lists(md_content)
+
+    extensions = [
+        'markdown.extensions.fenced_code', 
+        'codehilite', 'markdown.extensions.toc', 
+        'markdown.extensions.tables', 
+        ]
     extension_configs = {
         'markdown.extensions.toc': {
             'anchorlink': anchor_links,
@@ -33,7 +40,7 @@ def convert_markdown_to_html(md_content, icon_dir, anchor_links):
     html_content = md.convert(md_content)
 
     # 目次を取得
-    toc = md.toc
+    toc = md.toc if anchor_links else ""
 
     # info、warn、errorのブロックを変換
     html_content = convert_info_warn_alert_blocks(html_content, icon_dir)
@@ -61,6 +68,150 @@ def slugify(value, separator):
     slug = re.sub(r'[^\w\s-]', '', slug).strip().lower()
     slug = re.sub(r'[-\s]+', separator, slug)
     return slug
+
+# TODO:あまりにも汚いコードなのでリファクタリングする
+def convert_nested_lists(md_content):
+    """
+    ネストされたリストを適切に処理する関数。
+
+    Args:
+        md_content (str): Markdownの内容。
+
+    Returns:
+        str: 変換されたMarkdownの内容。
+    """
+    # 番号なしリストを変換
+    md_content = convert_unordered_list(md_content)
+    # 番号付きリストを変換
+    md_content = convert_ordered_list(md_content)
+    return md_content
+
+def convert_ordered_list(md_content):
+    """
+    番号付きリストを変換する関数。
+    Args:
+        md_content (str): Markdownの内容。
+    Returns:
+        str: 変換されたHTMLの内容。
+    """
+    # Markdownの内容を各行に分割
+    lines = md_content.split('\n')
+    # 変換後のHTMLの各行を格納するリスト
+    converted_lines = []
+    # リストのスタック（開いているリストの情報を追跡）
+    list_stack = []
+
+    # 各行に対して処理を行う
+    for line in lines:
+        # テーブルや特別な記法の行を無視する
+        if line.strip().startswith('|') or line.strip().startswith('<div class="style-'):
+            while list_stack:
+                converted_lines.append('</li>')
+                converted_lines.append('</{}>'.format(list_stack.pop()[0]))
+            converted_lines.append(line)
+            continue
+
+        # 行の先頭と末尾の空白を除去し、インデントレベルを計算
+        stripped_line = line.strip()
+        indent_level = len(line) - len(line.lstrip())
+
+        # 現在の行が番号付きリストのアイテムで始まる場合
+        if stripped_line and stripped_line[0].isdigit() and stripped_line.find('.') != -1:
+            # リストスタックが空（新しいリストの開始）または現在のインデントレベルが直前のリストよりも深い場合
+            if not list_stack or indent_level > list_stack[-1][1]:
+                # リストスタックに新しいリスト（ol）を追加し、HTMLに<ol>タグを追加
+                list_stack.append(('ol', indent_level))
+                converted_lines.append('<ol>')
+            else:
+                # 直前のリストよりも浅いインデントレベルの場合、直前のリストを閉じる
+                while list_stack and indent_level < list_stack[-1][1]:
+                    converted_lines.append('</li>')
+                    converted_lines.append('</{}>'.format(list_stack.pop()[0]))
+                # 現在のインデントレベルが直前のリストと同じ場合、直前のリストアイテムを閉じる
+                if list_stack and indent_level == list_stack[-1][1]:
+                    converted_lines.append('</li>')
+
+            # リストアイテムをHTMLに追加
+            converted_lines.append(f'<li>{stripped_line[stripped_line.index(".") + 1:].strip()}')
+        else:
+            # 空白行、見出しの行、またはインデントレベルが減少した場合、直前のリストを閉じる
+            while list_stack and (not stripped_line or stripped_line.startswith('#') or indent_level < list_stack[-1][1]):
+                converted_lines.append('</li>')
+                converted_lines.append('</{}>'.format(list_stack.pop()[0]))
+            # 現在の行が空でない場合、その行をHTMLに追加
+            if stripped_line:
+                converted_lines.append(line)
+
+    # ループ終了後、残っている開いているリストをすべて閉じる
+    while list_stack:
+        converted_lines.append('</li>')
+        converted_lines.append('</{}>'.format(list_stack.pop()[0]))
+
+    # 変換されたHTMLを改行で結合して返す
+    return '\n'.join(converted_lines)
+
+def convert_unordered_list(md_content):
+    """
+    番号なしリストを変換する関数。
+    Args:
+        md_content (str): Markdownの内容。
+    Returns:
+        str: 変換されたHTMLの内容。
+    """
+    # Markdownの内容を各行に分割
+    lines = md_content.split('\n')
+    # 変換後のHTMLの各行を格納するリスト
+    converted_lines = []
+    # リストのスタック（開いているリストの情報を追跡）
+    list_stack = []
+
+    # 各行に対して処理を行う
+    for line in lines:
+        # テーブルや特別な記法の行を無視する
+        if line.strip().startswith('|') or line.strip().startswith('<div class="style-'):
+            while list_stack:
+                converted_lines.append('</li>')
+                converted_lines.append('</{}>'.format(list_stack.pop()[0]))
+            converted_lines.append(line)
+            continue
+
+        # 行の先頭と末尾の空白を除去し、インデントレベルを計算
+        stripped_line = line.strip()
+        indent_level = len(line) - len(line.lstrip())
+
+        # 現在の行が番号なしリストのアイテムで始まる場合
+        if stripped_line.startswith('- ') or stripped_line.startswith('* '):
+            # リストスタックが空（新しいリストの開始）または現在のインデントレベルが直前のリストよりも深い場合
+            if not list_stack or indent_level > list_stack[-1][1]:
+                # リストスタックに新しいリスト（ul）を追加し、HTMLに<ul>タグを追加
+                list_stack.append(('ul', indent_level))
+                converted_lines.append('<ul>')
+            else:
+                # 直前のリストよりも浅いインデントレベルの場合、直前のリストを閉じる
+                while list_stack and indent_level < list_stack[-1][1]:
+                    converted_lines.append('</{}>'.format(list_stack.pop()[0]))
+                # 現在のインデントレベルが直前のリストと同じ場合、直前のリストアイテムを閉じる
+                if list_stack and indent_level == list_stack[-1][1]:
+                    converted_lines.append('</li>')
+
+            # リストアイテムをHTMLに追加
+            converted_lines.append(f'<li>{stripped_line[2:]}')
+        else:
+            # 空白行、見出しの行、またはインデントレベルが減少した場合、直前のリストを閉じる
+            while list_stack and (not stripped_line or stripped_line.startswith('#') or indent_level < list_stack[-1][1]):
+                converted_lines.append('</li>')
+                converted_lines.append('</{}>'.format(list_stack.pop()[0]))
+            # 現在の行が空でない場合、その行をHTMLに追加
+            if stripped_line:
+                converted_lines.append(line)
+
+    # ループ終了後、残っている開いているリストをすべて閉じる
+    while list_stack:
+        converted_lines.append('</li>')
+        converted_lines.append('</{}>'.format(list_stack.pop()[0]))
+
+    # 変換されたHTMLを改行で結合して返す
+    return '\n'.join(converted_lines)
 
 def convert_info_warn_alert_blocks(html_content, icon_dir):
     """
