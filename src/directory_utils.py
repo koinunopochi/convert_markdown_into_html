@@ -49,7 +49,8 @@ def generate_and_save_index_html(doc_dir, output_dir, ignore_patterns):
         output_dir (str): 出力先のディレクトリのパス。
         ignore_patterns (list): 無視するパターンのリスト。
     """
-    index_content = generate_index_links_from_directory(doc_dir, output_dir, ignore_patterns)
+    # index_content = generate_index_links_from_directory(doc_dir, output_dir, ignore_patterns)
+    index_content = IndexLinkGenerator(output_dir, ignore_patterns).generate_index_links(doc_dir)
     index_path = os.path.join(output_dir, "index.html")
     File(index_path).save(generate_index_html(index_content))
 
@@ -68,47 +69,130 @@ def convert_markdown_file_to_html(file_path, output_dir, icon_dir,anchor_links):
     html_path = os.path.join(output_dir, html_file)
     File(html_path).save(generate_html_content(os.path.splitext(os.path.basename(file_path))[0], html_content))
 
+class IndexLinkGenerator:
+    def __init__(self, output_dir, ignore_patterns):
+        self.output_dir = output_dir
+        self.ignore_patterns = ignore_patterns
 
-# TODO:ネストは１つまでにする
-def generate_index_links_from_directory(dir_path, output_dir, ignore_patterns, level=0):
-    """
-    ディレクトリ内の.mdファイルからindex.htmlに追加するリンクのHTMLを生成する関数。
+    def generate_index_links(self, dir_path, level=0):
+        """
+        ディレクトリ内の.mdファイルからindex.htmlに追加するリンクのHTMLを生成するメソッド。
+        Args:
+            dir_path (str): 探索するディレクトリのパス。
+            level (int): 階層レベル（デフォルトは0）。
+        Returns:
+            str: index.htmlに追加するリンクのHTML。
+        """
+        index_links = ""
+        indent = self._generate_indent(level)
 
-    Args:
-        dir_path (str): 探索するディレクトリのパス。
-        output_dir (str): 出力先のディレクトリのパス。
-        ignore_patterns (list): 無視するパターンのリスト。
-        level (int): 階層レベル（デフォルトは0）。
+        index_links += self._generate_directory_name(dir_path, indent)
+        index_links += self._generate_opening_ul_tag(indent)
 
-    Returns:
-        str: index.htmlに追加するリンクのHTML。
-    """
-    index_links = ""
-    indent = "  " * level  # インデントを表現するための空白文字列
+        for item in os.listdir(dir_path):
+            item_path = os.path.join(dir_path, item)
+            relative_path = os.path.relpath(item_path, dir_path)
 
-    # ディレクトリ名を表示
-    index_links += f"{indent}<li>{os.path.basename(dir_path)}/</li>\n"
-    index_links += f"{indent}<ul>\n"
+            if not is_ignored(relative_path, self.ignore_patterns):
+                index_links += self._generate_item_link(item_path, dir_path, level, indent)
 
-    for item in os.listdir(dir_path):
+        index_links += self._generate_closing_ul_tag(indent)
+
+        return index_links
+
+    def _generate_indent(self, level):
+        """
+        インデントを生成するプライベートメソッド。
+        """
+        return " " * level
+
+    def _generate_directory_name(self, dir_path, indent):
+        """
+        ディレクトリ名を生成するプライベートメソッド。
+        """
+        return f"{indent}<li>{os.path.basename(dir_path)}/</li>\n"
+
+    def _generate_opening_ul_tag(self, indent):
+        """
+        開始の<ul>タグを生成するプライベートメソッド。
+        """
+        return f"{indent}<ul>\n"
+
+    def _generate_closing_ul_tag(self, indent):
+        """
+        終了の</ul>タグを生成するプライベートメソッド。
+        """
+        return f"{indent}</ul>\n"
+
+    def _generate_item_link(self, item_path, dir_path, level, indent):
+        """
+        アイテム（ディレクトリまたはファイル）のリンクを生成するプライベートメソッド。
+        """
+        if os.path.isdir(item_path):
+            return self._generate_sub_directory_links(item_path, level + 1)
+        elif item_path.endswith(".md"):
+            return self._generate_markdown_file_link(item_path, dir_path, indent)
+        else:
+            return ""
+
+    def _generate_sub_directory_links(self, sub_dir_path, level):
+        """
+        サブディレクトリ内のリンクを生成するプライベートメソッド。
+        """
+        sub_links = self.generate_index_links(sub_dir_path, level)
+        return sub_links
+
+    def _generate_markdown_file_link(self, item_path, dir_path, indent):
+        """
+        Markdownファイルのリンクを生成するプライベートメソッド。
+        """
+        html_file = File(item_path).generate_html_file_name()
+        relative_path = generate_relative_path(item_path, dir_path)
+        link_text = generate_link_text(relative_path)
+        link = f"{indent} <li><a href='{html_file}'>{link_text}</a></li>\n"
+        return link
+
+# # TODO:ネストは１つまでにする
+# def generate_index_links_from_directory(dir_path, output_dir, ignore_patterns, level=0):
+#     """
+#     ディレクトリ内の.mdファイルからindex.htmlに追加するリンクのHTMLを生成する関数。
+
+#     Args:
+#         dir_path (str): 探索するディレクトリのパス。
+#         output_dir (str): 出力先のディレクトリのパス。
+#         ignore_patterns (list): 無視するパターンのリスト。
+#         level (int): 階層レベル（デフォルトは0）。
+
+#     Returns:
+#         str: index.htmlに追加するリンクのHTML。
+#     """
+#     index_links = ""
+#     indent = "  " * level  # インデントを表現するための空白文字列
+
+#     # ディレクトリ名を表示
+#     index_links += f"{indent}<li>{os.path.basename(dir_path)}/</li>\n"
+#     index_links += f"{indent}<ul>\n"
+
+#     for item in os.listdir(dir_path):
         
-        item_path = os.path.join(dir_path, item)
-        relative_path = os.path.relpath(item_path, dir_path)
+#         item_path = os.path.join(dir_path, item)
+#         relative_path = os.path.relpath(item_path, dir_path)
 
-        if not is_ignored(relative_path, ignore_patterns):
+#         if not is_ignored(relative_path, ignore_patterns):
 
-          if os.path.isdir(item_path):
-              # 再帰的にサブディレクトリを探索
-              index_links += generate_index_links_from_directory(item_path, output_dir, ignore_patterns, level + 1)
+#           if os.path.isdir(item_path):
+#               # 再帰的にサブディレクトリを探索
+#               index_links += generate_index_links_from_directory(item_path, output_dir, ignore_patterns, level + 1)
 
-          elif item.endswith(".md"):
-              html_file = File(item_path).generate_html_file_name()
-              relative_path = generate_relative_path(item_path, dir_path)
-              link_text = generate_link_text(relative_path)
-              index_links += f"{indent}  <li><a href='{html_file}'>{link_text}</a></li>\n"
+#           elif item.endswith(".md"):
+#               html_file = File(item_path).generate_html_file_name()
+#               relative_path = generate_relative_path(item_path, dir_path)
+#               link_text = generate_link_text(relative_path)
+#               index_links += f"{indent}  <li><a href='{html_file}'>{link_text}</a></li>\n"
 
-    index_links += f"{indent}</ul>\n"
-    return index_links
+#     index_links += f"{indent}</ul>\n"
+#     return index_links
+
 
 # ################ 相対パスやリンクテキストの生成に関する関数 ################
 # TODO:移動する
