@@ -1,6 +1,7 @@
 from directory_utils import process_markdown_files_in_directory, generate_and_save_index_html
-from command_line import validate_command_line_arguments
-from file_utils import create_output_directories, copy_css, copy_icon
+from infrastructure.cli.command_line import validate_command_line_arguments
+from infrastructure.common.directory import Directory
+from infrastructure.common.copy import Copy
 from html_utils import generate_pygments_css
 from markdownignore import read_markdownignore
 import os
@@ -11,11 +12,15 @@ def main():
     """
     doc_dir, output_dir,index_only,no_index,no_style, anchor_links  = validate_command_line_arguments()
 
-    create_output_directories(output_dir)
-    copy_icon(output_dir)
+    # 出力先のディレクトリを作成
+    Directory(output_dir).create_required_directories()
+
+    # iconディレクトリとcssディレクトリをコピー
+    copy = Copy(output_dir)
+    copy.copy_icon_directory()
     # --no-styleオプションが指定された場合はCSSのコピーをスキップ
     if not no_style:
-        copy_css(output_dir)
+        copy.copy_css_directory()
     else:
         print('CSSのコピーをスキップしました。')
     
