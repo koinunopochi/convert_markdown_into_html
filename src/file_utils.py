@@ -1,6 +1,8 @@
 import os
 import shutil
+# TODO：ファイル名を変更する
 
+# TODO:クラス化する
 def read_file(file_path):
     """
     ファイルを読み込む関数。
@@ -25,7 +27,7 @@ def save_file(file_path, content):
     with open(file_path, "w", encoding="utf-8") as file:
         file.write(content)
 
-
+# TODO:ファイルではないので、移動する
 def create_output_directories(output_dir):
     """
     出力先のディレクトリとcssディレクトリを作成する関数。
@@ -37,6 +39,7 @@ def create_output_directories(output_dir):
     css_dir = os.path.join(output_dir, "css")
     os.makedirs(css_dir, exist_ok=True)
 
+# TODO:ファイルではないので、移動する
 def copy_icon(output_dir):
     """
     styleディレクトリからiconディレクトリをコピーする関数。
@@ -51,6 +54,7 @@ def copy_icon(output_dir):
     if os.path.exists(icon_src_dir):
         shutil.copytree(icon_src_dir, icon_dest_dir, dirs_exist_ok=True)
 
+# TODO:ファイルではないので、移動する
 def copy_css(output_dir):
     """
     styleディレクトリからcssディレクトリをコピーする関数。
