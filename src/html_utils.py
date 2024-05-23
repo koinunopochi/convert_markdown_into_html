@@ -6,7 +6,7 @@ from pygments.lexers import get_lexer_by_name
 from pygments.formatters import HtmlFormatter
 import os
 
-from file_utils import read_file
+from infrastructure.common.file import File
 
 def convert_markdown_to_html(md_content, icon_dir, anchor_links):
     """
@@ -302,7 +302,7 @@ def generate_html_content(title, content):
         str: 生成されたHTMLファイルの内容。
     """
     template_path = os.path.join(os.path.dirname(__file__), 'template_content.html')
-    template = read_file(template_path)
+    template = File(template_path).read()
     return template.format(title=title, content=content)
 
 def generate_pygments_css(output_dir):

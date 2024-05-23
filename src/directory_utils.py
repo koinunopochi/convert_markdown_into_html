@@ -1,5 +1,5 @@
 import os
-from file_utils import read_file, save_file
+from infrastructure.common.file import File
 from html_utils import convert_markdown_to_html, generate_html_content, generate_index_html
 from markdownignore import is_ignored
 
@@ -34,7 +34,7 @@ def generate_and_save_index_html(doc_dir, output_dir, ignore_patterns):
     """
     index_content = generate_index_links_from_directory(doc_dir, output_dir, ignore_patterns)
     index_path = os.path.join(output_dir, "index.html")
-    save_file(index_path, generate_index_html(index_content))
+    File(index_path).save(generate_index_html(index_content))
 
 # TODO；Save fileの処理を移動する
 def convert_markdown_file_to_html(file_path, output_dir, icon_dir,anchor_links):
@@ -45,11 +45,12 @@ def convert_markdown_file_to_html(file_path, output_dir, icon_dir,anchor_links):
         file_path (str): 変換するMarkdownファイルのパス。
         output_dir (str): 出力先のディレクトリのパス。
     """
-    md_content = read_file(file_path)
+    md_content = File(file_path).read()
     html_content = convert_markdown_to_html(md_content, icon_dir,anchor_links)
     html_file = os.path.splitext(os.path.basename(file_path))[0] + ".html"
     html_path = os.path.join(output_dir, html_file)
-    save_file(html_path, generate_html_content(os.path.splitext(os.path.basename(file_path))[0], html_content))
+    File(html_path).save(generate_html_content(os.path.splitext(os.path.basename(file_path))[0], html_content))
+
 
 # TODO:ネストは１つまでにする
 def generate_index_links_from_directory(dir_path, output_dir, ignore_patterns, level=0):
