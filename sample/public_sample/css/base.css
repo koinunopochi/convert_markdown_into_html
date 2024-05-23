@@ -67,6 +67,10 @@ code {
   padding: 0.2em 0.4em;
 }
 
+code span:first-child {
+  margin-left: -4px;
+}
+
 .directory {
   font-weight: bold;
   color: #333;
@@ -124,14 +128,14 @@ code {
   padding: 10px;
   border: 1px solid #ccc;
   border-radius: 4px;
-  /* textは折り返さない */
+  /* / textは折り返さない / */
   white-space: nowrap;
   overflow: auto;
-  /* スクロールしても追従する */
+  /* / スクロールしても追従する / */
   position: -webkit-sticky;
   position: sticky;
   top: 20px;
-  /* スクロールしてもz-indexが最も上になる */
+  /* / スクロールしてもz-indexが最も上になる */
   z-index: 1000;
 }
 
@@ -150,4 +154,85 @@ code {
 
 .toc a:hover {
   text-decoration: underline;
+}
+
+/* バッククオートのスタイル */
+.backquote {
+  background-color: #fcb7b7;
+  color: #333;
+  padding: 2px 4px;
+  border-radius: 4px;
+  font-family: 'Courier New', monospace;
+}
+/* テーブルのスタイル */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1.5rem;
+}
+th,
+td {
+  padding: 0.75rem;
+  text-align: left;
+  border-bottom: 1px solid #dee2e6;
+}
+th {
+  background-color: #f8f9fa;
+  font-weight: bold;
+}
+/* 引用のスタイル */
+blockquote {
+ margin: 0;
+ padding: 2px 10px;
+ border-left: 4px solid #979da1;
+ border-radius: 4px;
+ color: #495057;
+}
+
+blockquote p {
+ margin-bottom: 0;
+}
+/* リンクのスタイル */
+a {
+  color: #007bff;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+a:hover {
+  color: #0056b3;
+  text-decoration: underline;
+}
+/* 全体的な調整 */
+body {
+  font-size: 16px;
+}
+h2 {
+  font-size: 2rem;
+  margin-top: 2.5rem;
+  margin-bottom: 1rem;
+  color: #343a40;
+}
+h3 {
+  font-size: 1.75rem;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  color: #343a40;
+}
+h4 {
+  font-size: 1.5rem;
+  margin-top: 1.5rem;
+  margin-bottom: 1rem;
+  color: #343a40;
+}
+p {
+  margin-bottom: 1rem;
+}
+ul,
+ol {
+  margin-bottom: 1.5rem;
+}
+img {
+  max-width: 100%;
+  height: auto;
+  margin-bottom: 1.5rem;
 }
