@@ -100,11 +100,23 @@ def convert_ordered_list(md_content):
     converted_lines = []
     # リストのスタック（開いているリストの情報を追跡）
     list_stack = []
+    # テーブルの状態を追跡するフラグ
+    inside_table = False
 
     # 各行に対して処理を行う
     for line in lines:
+        # テーブルの開始行を検出する
+        if line.strip().startswith('|'):
+            inside_table = True
+
+        # テーブルの終了行を検出する
+        if inside_table and not line.strip().startswith('|'):
+            inside_table = False
+            converted_lines.append('')  # テーブルの最後に改行を追加
+
         # テーブルや特別な記法の行を無視する
-        if line.strip().startswith('|') or line.strip().startswith('<div class="style-'):
+        if inside_table or line.strip().startswith('<div class="style-'):
+            # 開いているリストがある場合は閉じる
             while list_stack:
                 converted_lines.append('</li>')
                 converted_lines.append('</{}>'.format(list_stack.pop()[0]))
@@ -164,11 +176,23 @@ def convert_unordered_list(md_content):
     converted_lines = []
     # リストのスタック（開いているリストの情報を追跡）
     list_stack = []
+    # テーブルの状態を追跡するフラグ
+    inside_table = False
 
     # 各行に対して処理を行う
     for line in lines:
+        # テーブルの開始行を検出する
+        if line.strip().startswith('|'):
+            inside_table = True
+
+        # テーブルの終了行を検出する
+        if inside_table and not line.strip().startswith('|'):
+            inside_table = False
+            converted_lines.append('')  # テーブルの最後に改行を追加
+
         # テーブルや特別な記法の行を無視する
-        if line.strip().startswith('|') or line.strip().startswith('<div class="style-'):
+        if inside_table or line.strip().startswith('<div class="style-'):
+            # 開いているリストがある場合は閉じる
             while list_stack:
                 converted_lines.append('</li>')
                 converted_lines.append('</{}>'.format(list_stack.pop()[0]))
