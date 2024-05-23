@@ -40,31 +40,31 @@ import shutil
 #     os.makedirs(css_dir, exist_ok=True)
 
 # TODO:ファイルではないので、移動する
-def copy_icon(output_dir):
-    """
-    styleディレクトリからiconディレクトリをコピーする関数。
+# def copy_icon(output_dir):
+#     """
+#     styleディレクトリからiconディレクトリをコピーする関数。
 
-    Args:
-        output_dir (str): 出力先のディレクトリのパス。
-    """
-    style_dir = os.path.join(os.path.dirname(__file__), "style")
+#     Args:
+#         output_dir (str): 出力先のディレクトリのパス。
+#     """
+#     style_dir = os.path.join(os.path.dirname(__file__), "style")
     
-    icon_src_dir = os.path.join(style_dir, "icon")
-    icon_dest_dir = os.path.join(output_dir, "icon")
-    if os.path.exists(icon_src_dir):
-        shutil.copytree(icon_src_dir, icon_dest_dir, dirs_exist_ok=True)
+#     icon_src_dir = os.path.join(style_dir, "icon")
+#     icon_dest_dir = os.path.join(output_dir, "icon")
+#     if os.path.exists(icon_src_dir):
+#         shutil.copytree(icon_src_dir, icon_dest_dir, dirs_exist_ok=True)
 
-# TODO:ファイルではないので、移動する
-def copy_css(output_dir):
-    """
-    styleディレクトリからcssディレクトリをコピーする関数。
+# # TODO:ファイルではないので、移動する
+# def copy_css(output_dir):
+#     """
+#     styleディレクトリからcssディレクトリをコピーする関数。
 
-    Args:
-        output_dir (str): 出力先のディレクトリのパス。
-    """
-    style_dir = os.path.join(os.path.dirname(__file__), "style")
+#     Args:
+#         output_dir (str): 出力先のディレクトリのパス。
+#     """
+#     style_dir = os.path.join(os.path.dirname(__file__), "style")
 
-    css_src_dir = os.path.join(style_dir, "css")
-    css_dest_dir = os.path.join(output_dir, "css")
-    if os.path.exists(css_src_dir):
-        shutil.copytree(css_src_dir, css_dest_dir, dirs_exist_ok=True)
+#     css_src_dir = os.path.join(style_dir, "css")
+#     css_dest_dir = os.path.join(output_dir, "css")
+#     if os.path.exists(css_src_dir):
+#         shutil.copytree(css_src_dir, css_dest_dir, dirs_exist_ok=True)
