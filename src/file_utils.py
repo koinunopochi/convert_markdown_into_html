@@ -28,16 +28,16 @@ import shutil
 #         file.write(content)
 
 # TODO:ファイルではないので、移動する
-def create_output_directories(output_dir):
-    """
-    出力先のディレクトリとcssディレクトリを作成する関数。
+# def create_output_directories(output_dir):
+#     """
+#     出力先のディレクトリとcssディレクトリを作成する関数。
 
-    Args:
-        output_dir (str): 出力先のディレクトリのパス。
-    """
-    os.makedirs(output_dir, exist_ok=True)
-    css_dir = os.path.join(output_dir, "css")
-    os.makedirs(css_dir, exist_ok=True)
+#     Args:
+#         output_dir (str): 出力先のディレクトリのパス。
+#     """
+#     os.makedirs(output_dir, exist_ok=True)
+#     css_dir = os.path.join(output_dir, "css")
+#     os.makedirs(css_dir, exist_ok=True)
 
 # TODO:ファイルではないので、移動する
 def copy_icon(output_dir):
