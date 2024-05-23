@@ -1,11 +1,18 @@
 .history
 doc
 .public
-
+.sample*
+.mark*
 # vscode
 .vscode
 
 # python
-.venv
-__pycache__
+__pycache__/
+*.pyc
+*.pyo
+venv/
+.env
+.idea/
 
+# setup cache
+mkToHtml.egg*
