@@ -1,5 +1,5 @@
 from directory_utils import process_markdown_files_in_directory, generate_and_save_index_html
-from command_line import validate_command_line_arguments
+from infrastructure.command_line import validate_command_line_arguments
 from file_utils import create_output_directories, copy_css, copy_icon
 from html_utils import generate_pygments_css
 from markdownignore import read_markdownignore
