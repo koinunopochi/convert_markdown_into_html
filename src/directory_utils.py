@@ -93,20 +93,6 @@ def generate_index_links_from_directory(dir_path, output_dir, ignore_patterns, l
     index_links += f"{indent}</ul>\n"
     return index_links
 
-# ################ htmlの作成に関する関数 ################
-# TODO:移動する
-# def generate_html_file_name(item):
-#     """
-#     アイテム名からHTMLファイル名を生成する関数。
-
-#     Args:
-#         item (str): アイテム名。
-
-#     Returns:
-#         str: 生成されたHTMLファイル名。
-#     """
-#     return os.path.splitext(item)[0] + ".html"
-
 # ################ 相対パスやリンクテキストの生成に関する関数 ################
 # TODO:移動する
 def generate_relative_path(item_path, dir_path):
