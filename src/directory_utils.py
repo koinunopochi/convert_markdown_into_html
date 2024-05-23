@@ -85,7 +85,7 @@ def generate_index_links_from_directory(dir_path, output_dir, ignore_patterns, l
               index_links += generate_index_links_from_directory(item_path, output_dir, ignore_patterns, level + 1)
 
           elif item.endswith(".md"):
-              html_file = generate_html_file_name(item)
+              html_file = File(item_path).generate_html_file_name()
               relative_path = generate_relative_path(item_path, dir_path)
               link_text = generate_link_text(relative_path)
               index_links += f"{indent}  <li><a href='{html_file}'>{link_text}</a></li>\n"
@@ -95,17 +95,17 @@ def generate_index_links_from_directory(dir_path, output_dir, ignore_patterns, l
 
 # ################ htmlの作成に関する関数 ################
 # TODO:移動する
-def generate_html_file_name(item):
-    """
-    アイテム名からHTMLファイル名を生成する関数。
+# def generate_html_file_name(item):
+#     """
+#     アイテム名からHTMLファイル名を生成する関数。
 
-    Args:
-        item (str): アイテム名。
+#     Args:
+#         item (str): アイテム名。
 
-    Returns:
-        str: 生成されたHTMLファイル名。
-    """
-    return os.path.splitext(item)[0] + ".html"
+#     Returns:
+#         str: 生成されたHTMLファイル名。
+#     """
+#     return os.path.splitext(item)[0] + ".html"
 
 # ################ 相対パスやリンクテキストの生成に関する関数 ################
 # TODO:移動する

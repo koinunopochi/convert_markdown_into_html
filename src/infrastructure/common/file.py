@@ -1,3 +1,5 @@
+import os
+
 class File:
     def __init__(self, file_path):
         self.file_path = file_path
@@ -21,3 +23,13 @@ class File:
         """
         with open(self.file_path, "w", encoding="utf-8") as file:
             file.write(content)
+    
+    def generate_html_file_name(self):
+        """
+        アイテム名からHTMLファイル名を生成するメソッド。
+        
+        Returns:
+            str: 生成されたHTMLファイル名。
+        """
+        item = os.path.basename(self.file_path)
+        return os.path.splitext(item)[0] + ".html"
