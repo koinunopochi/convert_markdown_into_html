@@ -4,23 +4,40 @@ from html_utils import convert_markdown_to_html, generate_html_content, generate
 from markdownignore import is_ignored
 
 # TODO:ネストは１つまでにする
-def process_markdown_files_in_directory(doc_dir, output_dir, icon_dir, ignore_patterns,anchor_links):
-    """
-    ディレクトリ内の.mdファイルを処理する関数。
+class MarkdownProcessor:
+    def __init__(self, doc_dir, output_dir, icon_dir, ignore_patterns, anchor_links):
+        self.doc_dir = doc_dir
+        self.output_dir = output_dir
+        self.icon_dir = icon_dir
+        self.ignore_patterns = ignore_patterns
+        self.anchor_links = anchor_links
 
-    Args:
-        doc_dir (str): 探索するディレクトリのパス。
-        output_dir (str): 出力先のディレクトリのパス。
-        icon_dir (str): アイコンファイルのディレクトリパス。
-        ignore_patterns (list): 無視するパターンのリスト。
-    """
-    for root, dirs, files in os.walk(doc_dir):
-        for file in files:
-            if file.endswith(".md"):
-                file_path = os.path.join(root, file)
-                relative_path = os.path.relpath(file_path, doc_dir)
-                if not is_ignored(relative_path, ignore_patterns):
-                  convert_markdown_file_to_html(file_path, output_dir, icon_dir,anchor_links)
+    def process_markdown_files(self):
+        """
+        ディレクトリ内の.mdファイルを処理するメソッド。
+        """
+        for root, dirs, files in os.walk(self.doc_dir):
+            for file in files:
+                self._setup_markdown_file(file, root)
+
+    def _setup_markdown_file(self, file, root):
+        """
+        Markdownファイルを変換するためのセットアップを行うプライベートメソッド。
+        """
+        if file.endswith(".md"):
+            file_path = os.path.join(root, file)
+            relative_path = os.path.relpath(file_path, self.doc_dir)
+            self._convert_markdown_file(relative_path, file_path)
+
+    def _convert_markdown_file(self, relative_path, file_path):
+        """
+        無視されないMarkdownファイルを変換するプライベートメソッド。
+        """
+        print(relative_path)
+        # print(self.ignore_patterns)
+        if not is_ignored(relative_path, self.ignore_patterns):
+            convert_markdown_file_to_html(file_path,self.output_dir, self.icon_dir, self.anchor_links)
+
 
 # TODO；Save fileの処理を移動する
 def generate_and_save_index_html(doc_dir, output_dir, ignore_patterns):
