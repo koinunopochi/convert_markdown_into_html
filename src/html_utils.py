@@ -23,6 +23,9 @@ def convert_markdown_to_html(md_content, icon_dir, anchor_links):
     # ネストされたリストを適切に処理
     md_content = convert_nested_lists(md_content)
 
+    # `で囲まれた部分を変換
+    md_content = convert_backquotes(md_content)
+
     extensions = [
         'markdown.extensions.fenced_code', 
         'codehilite', 'markdown.extensions.toc', 
@@ -44,9 +47,6 @@ def convert_markdown_to_html(md_content, icon_dir, anchor_links):
 
     # info、warn、errorのブロックを変換
     html_content = convert_info_warn_alert_blocks(html_content, icon_dir)
-
-    # `で囲まれた部分を変換
-    html_content = convert_backquotes(html_content)
 
     # 目次を右側に配置
     if anchor_links:
@@ -91,7 +91,7 @@ def convert_backquotes(md_content):
     md_content = re.sub(code_block_pattern, replace_code_block, md_content)
     
     # `で囲まれた部分を探す正規表現パターン
-    pattern = r'`([^`]+)`'
+    pattern = r'(?<=\s|\n)`([^`]+)`(?=\s|\n)'
     
     # `で囲まれた部分を<span>タグに置換する
     converted_content = re.sub(pattern, r'<span class="backquote">\1</span>', md_content)
