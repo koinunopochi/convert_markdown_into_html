@@ -1,4 +1,4 @@
-from directory_utils import process_markdown_files_in_directory, generate_and_save_index_html
+from directory_utils import generate_and_save_index_html,MarkdownProcessor
 from infrastructure.cli.command_line import validate_command_line_arguments
 from infrastructure.common.directory import Directory
 from infrastructure.common.copy import Copy
@@ -33,7 +33,8 @@ def main():
         return
     
     icon_dir = os.path.join(output_dir, 'icon')
-    process_markdown_files_in_directory(doc_dir, output_dir, icon_dir, ignore_patterns, anchor_links)
+    # process_markdown_files_in_directory(doc_dir, output_dir, icon_dir, ignore_patterns, anchor_links)
+    MarkdownProcessor(doc_dir, output_dir, icon_dir, ignore_patterns, anchor_links).process_markdown_files()
 
     # --no-indexオプションが指定された場合はindex.htmlを生成しない
     if no_index:
